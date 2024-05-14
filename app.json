@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "geo",
+    "slug": "geo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.daviflimaandrade.geo"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "owner": "daviflimaandrade",
+    "extra": {
+      "eas": {
+        "projectId": "3551048d-d148-4e41-8315-d2794bcf8c66"
+      }
+    }
+  }
+}
