@@ -1,59 +1,43 @@
-import React, { Component } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import Geolocation from '@react-native-community/geolocation';
+// App.js
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import * as Location from 'expo-location';
+import { MapView } from 'react-native-maps'
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      latitude: null,
-      longitude: null,
-      error: null,
-    };
-  }
 
-  componentDidMount() {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        this.setState({
-          latitude,
-          longitude,
-          error: null,
-        });
-      },
-      (error) => this.setState({ error: error.message }),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
-  }
+const { width, height } = Dimensions.get('window');
 
+export default class App extends Component {
   render() {
-    return (
-      <View>
-        <Text>Latitude: {this.state.latitude}</Text>
-        <Text>Longitude: {this.state.longitude}</Text>
-        {this.state.error ? (
-          <Text>Error: {this.state.error}</Text>
-        ) : null}
-        <Button
-          title="Get Location"
-          onPress={() => this.componentDidMount()}
-        />
-      </View>
+   return (
+    <View style={styles.container}>
+     // Adicionar o MapView 
+     <MapView
+      style={styles.map}
+      loadingEnabled={true}
+      region={{
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.015,
+      longitudeDelta: 0.0121,
+      }}
+     >
+     </MapView>
+    </View>
     );
+   }
   }
-}
 
-export default App;
-
-const styles = StyleSheet.create(
-  {
-    container:{
-
-      justifyContent:'center',
-      alignItems:'center',
-      flex: 1
-      
+  const styles = StyleSheet.create(
+    {
+      map:{
+  
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+        
+      }
     }
-  }
-)
+  )
