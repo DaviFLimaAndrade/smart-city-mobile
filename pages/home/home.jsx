@@ -1,33 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Dimensions, Pressable  } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList } from 'react-native';
+import MapView, { Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import styles from './styles';
 
-const { width, height } = Dimensions.get('window');
+
 
 export default function Home() {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
   const initialRegion = {
     latitude: -22.9140639,
     longitude: -47.068686,
     latitudeDelta: 0.001,
     longitudeDelta: 0.001,
   };
+  
+  const [location, setLocation] = useState(null);
+  const [sensores, setSensores] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const fixedPoints = [
-    {
-      id: 1,
-      latitude: -22.9140639, 
-      longitude: -47.068065, 
-    },
-    {
-      id: 2,
-      latitude: -22.9141804, 
-      longitude: -47.0683294, 
-    }
-  ];
+  useEffect(() => {
+    // Obtém o token do AsyncStorage
+    AsyncStorage.getItem('token')
+      .then((token) => {
+        if (token != null) {
+          setToken(token);
+          // Chama a função fetchToken assim que o token for obtido
+          fetchToken(token);
+        }
+      })
+      .catch((erro) => {
+        console.error("Erro: ", erro);
+      })
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -40,7 +46,7 @@ export default function Home() {
       const locationSubscription = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.High,
-          timeInterval: 1000,
+          timeInterval: 100,
           distanceInterval: 1,
         },
         (newLocation) => {
@@ -54,73 +60,52 @@ export default function Home() {
     })();
   }, []);
 
-  let text = 'Waiting...';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = `Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
+  const fetchToken = async (token) => {
+    try {
+      const response = await axios.get('http://192.168.56.1:8000/api/sensores/', {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      setSensores(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Deu Erro:", error);
+    }
   }
 
   return (
     <View style={styles.container}>
-      <MapView
+      <MapView 
         style={styles.map}
         initialRegion={initialRegion}
       >
-        <Marker coordinate={{ latitude: -22.915, longitude: -47.0678 }} />
-        {fixedPoints.map(point => (
+        {sensores && sensores.map(sensor => (
           <Marker
-            key={point.id}
-            coordinate={{ latitude: point.latitude, longitude: point.longitude }}
-            pinColor="red" // Cor do marcador para os pontos fixos
+            key={sensor.id}
+            coordinate={{ latitude: sensor.latitude, longitude: sensor.longitude }}
+            pinColor="blue" 
+            title={`Sensor ${sensor.id}`}
           />
         ))}
         {location && (
-        <Marker
+          <Marker
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            pinColor="red" // Cor do marcador para a localização atual
-        />
+            pinColor="red" 
+          />
         )}
-
       </MapView>
-      <Text>{text}</Text>
-
-      <Pressable
-                        style={styles.btn}
-                        onPress={()=>criar(dados, token)}
-                    >
-                        <Text style={styles.btnCadastrar}>DETALHES</Text>
-        </Pressable>
-
-        
-
+      <Text>Latitude: {location?.latitude}, Longitude: {location?.longitude}</Text>
+      <FlatList
+        data={sensores}
+        renderItem={({ item }) => (
+          <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
+            <Text>{`Sensor ${item.id}`}</Text>
+            <Text>{`Latitude: ${item.latitude}, Longitude: ${item.longitude}`}</Text>
+          </View>
+        )}
+        keyExtractor={item => item.id.toString()}
+      />
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: width - 40,
-    height: height / 2,
-    borderRadius: 10,
-  },
-  btn: {
-    backgroundColor: 'blue',
-    width: 120,
-    height: 30,
-    display: "flex",
-    justifyContent: 'center',
-    marginTop: 30, 
-    borderRadius: 10
-  },
-  btnCadastrar: {
-    color: 'white',
-    textAlign: "center",
-    fontWeight: '700'
-  }
-});
+}  

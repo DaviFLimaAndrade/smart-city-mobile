@@ -85,6 +85,11 @@ export default function Routers(){
                     component={Home}
                     options={{ headerShown: false }}
                 />
+                <Pilha.Screen
+                    name="cadastro"
+                    component={Cadastro}
+                    options={{ headerShown: false }}
+                />
             </Pilha.Navigator>
         </NavigationContainer>
     )
