@@ -27,7 +27,7 @@ export default function Login({ navigation }) {
     const fetchToken = async () => {
         try{
             const response = await axios.post(
-                'http://192.168.56.1:8000/api/token/',
+                'https://daviflandrade.pythonanywhere.com/api/token/',
                 {
                     username: user,
                     password: password
@@ -47,7 +47,7 @@ export default function Login({ navigation }) {
     return (
         <View style={styles.container}>
             <View>
-                <Text style={styles.title}>Login</Text>
+                <Text style={styles.title}>LOGIN</Text>
             </View>
             <TextInput
                 placeholder='user'
